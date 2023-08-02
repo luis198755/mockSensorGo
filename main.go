@@ -41,12 +41,11 @@ func main() {
 	for {
 		generateRandomTemperature(&sensorData)
 
-		outputFile, err := os.OpenFile("./tmp/output_mock_sensor.json", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		outputFile, err := os.OpenFile("./tmp/output_mock_sensor.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			fmt.Println("Error opening file:", err)
 			return
 		}
-		defer outputFile.Close()
 
 		jsonData, err := json.Marshal(sensorData)
 		if err != nil {
@@ -54,9 +53,14 @@ func main() {
 			return
 		}
 
-		_, err = outputFile.WriteString(string(jsonData))
+		_, err = outputFile.WriteString(string(jsonData) + "\n")
 		if err != nil {
 			fmt.Println("Error writing to file:", err)
+		}
+
+		err = outputFile.Close()
+		if err != nil {
+			fmt.Println("Error closing file:", err)
 		}
 
 		time.Sleep(1 * time.Second)
